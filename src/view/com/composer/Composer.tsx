@@ -163,7 +163,9 @@ export const ComposePost = observer(function ComposePost({
     initQuote,
   )
 
-  const {selectVideo, state: videoUploadState} = useVideoUpload()
+  const {selectVideo, state: videoUploadState} = useVideoUpload({
+    setStatus: (status: string) => setProcessingState(status),
+  })
 
   const {extLink, setExtLink} = useExternalLinkFetch({setQuote})
   const [extGif, setExtGif] = useState<Gif>()
