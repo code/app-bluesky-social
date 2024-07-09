@@ -166,7 +166,13 @@ export const ComposePost = observer(function ComposePost({
 
   const {selectVideo, state: videoUploadState} = useVideoUpload({
     setStatus: (status: string) => setProcessingState(status),
+    onSuccess: () => {
+      if (publishOnUpload) {
+        onPressPublish(true)
+      }
+    },
   })
+  const [publishOnUpload, setPublishOnUpload] = useState(false)
 
   const {extLink, setExtLink} = useExternalLinkFetch({setQuote})
   const [extGif, setExtGif] = useState<Gif>()
@@ -275,12 +281,21 @@ export const ComposePost = observer(function ComposePost({
     return false
   }, [gallery.needsAltText, extLink, extGif, requireAltTextEnabled])
 
-  const onPressPublish = async () => {
+  const onPressPublish = async (finishedUploading?: boolean) => {
     if (isProcessing || graphemeLength > MAX_GRAPHEME_LENGTH) {
       return
     }
 
     if (isAltTextRequiredAndMissing) {
+      return
+    }
+
+    if (
+      !finishedUploading &&
+      videoUploadState.status !== 'idle' &&
+      videoUploadState.asset
+    ) {
+      setPublishOnUpload(true)
       return
     }
 
@@ -492,12 +507,15 @@ export const ComposePost = observer(function ComposePost({
                 {canPost ? (
                   <TouchableOpacity
                     testID="composerPublishBtn"
-                    onPress={onPressPublish}
+                    onPress={() => onPressPublish()}
                     accessibilityRole="button"
                     accessibilityLabel={
                       replyTo ? _(msg`Publish reply`) : _(msg`Publish post`)
                     }
-                    accessibilityHint="">
+                    accessibilityHint=""
+                    disabled={
+                      videoUploadState.status !== 'idle' && publishOnUpload
+                    }>
                     <LinearGradient
                       colors={[
                         gradients.blueLight.start,
@@ -578,7 +596,7 @@ export const ComposePost = observer(function ComposePost({
               autoFocus
               setRichText={setRichText}
               onPhotoPasted={onPhotoPasted}
-              onPressPublish={onPressPublish}
+              onPressPublish={() => onPressPublish()}
               onNewLink={onNewLink}
               onError={setError}
               accessible={true}
