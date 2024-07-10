@@ -24,7 +24,6 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
-import {LinearGradient} from 'expo-linear-gradient'
 import {
   AppBskyFeedDefs,
   AppBskyFeedGetPostThread,
@@ -68,14 +67,14 @@ import {useWebMediaQueries} from 'lib/hooks/useWebMediaQueries'
 import {cleanError} from 'lib/strings/errors'
 import {insertMentionAt} from 'lib/strings/mention-manip'
 import {shortenLinks} from 'lib/strings/rich-text-manip'
-import {colors, gradients, s} from 'lib/styles'
+import {colors, s} from 'lib/styles'
 import {isAndroid, isIOS, isNative, isWeb} from 'platform/detection'
 import {useDialogStateControlContext} from 'state/dialogs'
 import {GalleryModel} from 'state/models/media/gallery'
 import {ComposerOpts} from 'state/shell/composer'
 import {ComposerReplyTo} from 'view/com/composer/ComposerReplyTo'
 import {atoms as a, useTheme} from '#/alf'
-import {Button} from '#/components/Button'
+import {Button, ButtonText} from '#/components/Button'
 import {EmojiArc_Stroke2_Corner0_Rounded as EmojiSmile} from '#/components/icons/Emoji'
 import * as Prompt from '#/components/Prompt'
 import {QuoteEmbed, QuoteX} from '../util/post-embeds/QuoteEmbed'
@@ -505,51 +504,28 @@ export const ComposePost = observer(function ComposePost({
                   hasMedia={hasMedia}
                 />
                 {canPost ? (
-                  <TouchableOpacity
+                  <Button
                     testID="composerPublishBtn"
-                    onPress={() => onPressPublish()}
-                    accessibilityRole="button"
-                    accessibilityLabel={
+                    label={
                       replyTo ? _(msg`Publish reply`) : _(msg`Publish post`)
                     }
-                    accessibilityHint=""
+                    onPress={() => onPressPublish()}
+                    variant="solid"
+                    color="primary"
+                    shape="default"
+                    style={[a.rounded_full]}
+                    size="small"
                     disabled={
                       videoUploadState.status !== 'idle' && publishOnUpload
                     }>
-                    <LinearGradient
-                      colors={[
-                        gradients.blueLight.start,
-                        gradients.blueLight.end,
-                      ]}
-                      start={{x: 0, y: 0}}
-                      end={{x: 1, y: 1}}
-                      style={styles.postBtn}>
-                      {/* @TODO video make something better than this */}
-                      {videoUploadState.status !== 'idle' && publishOnUpload ? (
-                        <View
-                          style={[
-                            {
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                              zIndex: 1,
-                              borderRadius: 100,
-                            },
-                          ]}
-                        />
-                      ) : null}
-                      <Text style={[s.white, s.f16, s.bold]}>
-                        {replyTo ? (
-                          <Trans context="action">Reply</Trans>
-                        ) : (
-                          <Trans context="action">Post</Trans>
-                        )}
-                      </Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
+                    <ButtonText>
+                      {replyTo ? (
+                        <Trans context="action">Reply</Trans>
+                      ) : (
+                        <Trans context="action">Post</Trans>
+                      )}
+                    </ButtonText>
+                  </Button>
                 ) : (
                   <View style={[styles.postBtn, pal.btn]}>
                     <Text style={[pal.textLight, s.f16, s.bold]}>
