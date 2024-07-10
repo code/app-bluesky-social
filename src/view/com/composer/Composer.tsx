@@ -14,7 +14,6 @@ import {
   KeyboardAvoidingView,
   LayoutChangeEvent,
   StyleSheet,
-  TouchableOpacity,
   View,
 } from 'react-native'
 import Animated, {
@@ -60,7 +59,7 @@ import {useAgent, useSession} from '#/state/session'
 import {useComposerControls} from '#/state/shell/composer'
 import {useAnalytics} from 'lib/analytics/analytics'
 import * as apilib from 'lib/api/index'
-import {HITSLOP_10, MAX_GRAPHEME_LENGTH} from 'lib/constants'
+import {MAX_GRAPHEME_LENGTH} from 'lib/constants'
 import {useIsKeyboardVisible} from 'lib/hooks/useIsKeyboardVisible'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useWebMediaQueries} from 'lib/hooks/useWebMediaQueries'
@@ -474,20 +473,21 @@ export const ComposePost = observer(function ComposePost({
       <View style={[a.flex_1, viewStyles]} aria-modal accessibilityViewIsModal>
         <Animated.View style={topBarAnimatedStyle}>
           <View style={styles.topbarInner}>
-            <TouchableOpacity
-              testID="composerDiscardButton"
+            <Button
+              label={_(msg`Cancel`)}
+              variant="ghost"
+              color="primary"
+              shape="default"
+              size="small"
+              style={[a.rounded_full, a.py_sm]}
               onPress={onPressCancel}
-              onAccessibilityEscape={onPressCancel}
-              accessibilityRole="button"
-              accessibilityLabel={_(msg`Cancel`)}
               accessibilityHint={_(
                 msg`Closes post composer and discards post draft`,
-              )}
-              hitSlop={HITSLOP_10}>
-              <Text style={[pal.link, s.f18]}>
+              )}>
+              <ButtonText style={[a.text_md]}>
                 <Trans>Cancel</Trans>
-              </Text>
-            </TouchableOpacity>
+              </ButtonText>
+            </Button>
             <View style={a.flex_1} />
             {isProcessing ? (
               <>
@@ -844,7 +844,7 @@ const styles = StyleSheet.create({
   topbarInner: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
     height: 54,
     gap: 4,
   },
