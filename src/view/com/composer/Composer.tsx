@@ -517,16 +517,16 @@ export const ComposePost = observer(function ComposePost({
                     label={
                       replyTo ? _(msg`Publish reply`) : _(msg`Publish post`)
                     }
-                    onPress={() => onPressPublish()}
                     variant="solid"
                     color="primary"
                     shape="default"
-                    style={[a.rounded_full]}
                     size="small"
+                    style={[a.rounded_full, a.py_sm]}
+                    onPress={() => onPressPublish()}
                     disabled={
                       videoUploadState.status !== 'idle' && publishOnUpload
                     }>
-                    <ButtonText>
+                    <ButtonText style={[a.text_md]}>
                       {replyTo ? (
                         <Trans context="action">Reply</Trans>
                       ) : (
