@@ -162,7 +162,11 @@ export const ComposePost = observer(function ComposePost({
     initQuote,
   )
 
-  const {selectVideo, state: videoUploadState} = useVideoUpload({
+  const {
+    selectVideo,
+    clearVideo,
+    state: videoUploadState,
+  } = useVideoUpload({
     setStatus: (status: string) => setProcessingState(status),
     onSuccess: () => {
       if (publishOnUpload) {
@@ -642,7 +646,7 @@ export const ComposePost = observer(function ComposePost({
           ) : videoUploadState.video ? (
             // remove suspense when we get rid of lazy
             <Suspense fallback={null}>
-              <VideoPreview video={videoUploadState.video} clear={() => {}} />
+              <VideoPreview video={videoUploadState.video} clear={clearVideo} />
             </Suspense>
           ) : null}
         </Animated.ScrollView>
