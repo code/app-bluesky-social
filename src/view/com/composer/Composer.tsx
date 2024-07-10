@@ -17,6 +17,8 @@ import {
   View,
 } from 'react-native'
 import Animated, {
+  FadeIn,
+  FadeOut,
   interpolateColor,
   useAnimatedStyle,
   useSharedValue,
@@ -670,10 +672,15 @@ export const ComposePost = observer(function ComposePost({
             t.atoms.border_contrast_medium,
             styles.bottomBar,
           ]}>
-          {videoUploadState.asset ? (
-            <VideoUploadToolbar state={videoUploadState} />
+          {videoUploadState.status !== 'idle' ? (
+            <Animated.View entering={FadeIn} exiting={FadeOut}>
+              <VideoUploadToolbar state={videoUploadState} />
+            </Animated.View>
           ) : (
-            <View style={[a.flex_row, a.align_center, a.gap_xs]}>
+            <Animated.View
+              style={[a.flex_row, a.align_center, a.gap_xs]}
+              entering={FadeIn}
+              exiting={FadeOut}>
               <SelectPhotoBtn gallery={gallery} disabled={!canSelectImages} />
               {gate('videos') && (
                 <SelectVideoBtn
@@ -699,7 +706,7 @@ export const ComposePost = observer(function ComposePost({
                   <EmojiSmile size="lg" />
                 </Button>
               ) : null}
-            </View>
+            </Animated.View>
           )}
           <View style={a.flex_1} />
           <SelectLangBtn />
