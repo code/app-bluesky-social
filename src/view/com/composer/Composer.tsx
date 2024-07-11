@@ -101,7 +101,7 @@ import {SelectVideoBtn} from './videos/SelectVideoBtn'
 import {VideoPreview} from './videos/VideoPreview'
 import {VideoTranscodeProgress} from './videos/VideoTranscodeProgress'
 import hairlineWidth = StyleSheet.hairlineWidth
-import {useVideoUpload} from 'state/queries/video/upload-video'
+import {useVideoUpload} from 'state/queries/video/video'
 import {VideoUploadToolbar} from 'view/com/composer/Toolbar'
 
 type CancelRef = {
