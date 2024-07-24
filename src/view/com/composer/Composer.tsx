@@ -106,7 +106,7 @@ import {SelectVideoBtn} from './videos/SelectVideoBtn'
 import {VideoPreview} from './videos/VideoPreview'
 import {VideoTranscodeProgress} from './videos/VideoTranscodeProgress'
 import hairlineWidth = StyleSheet.hairlineWidth
-import {useVideoUpload} from 'state/queries/video/video'
+import {useUploadVideo} from 'state/queries/video/video'
 
 type CancelRef = {
   onPressCancel: () => void
@@ -172,7 +172,7 @@ export const ComposePost = observer(function ComposePost({
     selectVideo,
     clearVideo,
     state: videoUploadState,
-  } = useVideoUpload({
+  } = useUploadVideo({
     setStatus: (status: string) => setProcessingState(status),
     onSuccess: () => {
       if (publishOnUpload) {
