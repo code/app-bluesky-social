@@ -22,8 +22,7 @@ import {useSetDrawerOpen} from '#/state/shell'
 import {formatCount} from '#/view/com/util/numeric/format'
 import {UserAvatar} from '#/view/com/util/UserAvatar'
 import {NavSignupCard} from '#/view/shell/NavSignupCard'
-import {atoms as a} from '#/alf'
-import {useTheme} from '#/alf'
+import {atoms as a, useTheme, web} from '#/alf'
 import {Button, ButtonIcon, ButtonText} from '#/components/Button'
 import {Divider} from '#/components/Divider'
 import {
@@ -443,8 +442,8 @@ let ChatMenuItem = ({
           <Message style={[t.atoms.text]} width={iconWidth} />
         )
       }
-      label={_(msg`Chats`)}
-      accessibilityLabel={_(msg`Chats`)}
+      label={_(msg`Chat`)}
+      accessibilityLabel={_(msg`Chat`)}
       accessibilityHint=""
       bold={isActive}
       onPress={onPress}
@@ -629,7 +628,7 @@ function MenuItem({
         ) : undefined}
       </View>
       <Text
-        style={[a.flex_1, a.text_2xl, bold && a.font_bold]}
+        style={[a.flex_1, a.text_2xl, bold && a.font_bold, web(a.leading_snug)]}
         numberOfLines={1}>
         {label}
       </Text>
