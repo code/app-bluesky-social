@@ -76,7 +76,7 @@ export const ProfileFeedgens = React.forwardRef<
     if (isError && isEmpty) {
       items = items.concat([ERROR_ITEM])
     }
-    if (!isFetched && isFetching) {
+    if (!isFetched || isFetching) {
       items = items.concat([LOADING])
     } else if (isEmpty) {
       items = items.concat([EMPTY])
@@ -205,9 +205,7 @@ export const ProfileFeedgens = React.forwardRef<
         headerOffset={headerOffset}
         progressViewOffset={ios(0)}
         contentContainerStyle={isMobile && {paddingBottom: headerOffset + 100}}
-        indicatorStyle={t.name === 'light' ? 'black' : 'white'}
         removeClippedSubviews={true}
-        // @ts-ignore our .web version only -prf
         desktopFixedHeight
         onEndReached={onEndReached}
       />

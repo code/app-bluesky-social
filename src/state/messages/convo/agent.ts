@@ -1,6 +1,6 @@
 import {
-  AppBskyActorDefs,
   BskyAgent,
+  ChatBskyActorDefs,
   ChatBskyConvoDefs,
   ChatBskyConvoGetLog,
   ChatBskyConvoSendMessage,
@@ -80,8 +80,8 @@ export class Convo {
 
   convoId: string
   convo: ChatBskyConvoDefs.ConvoView | undefined
-  sender: AppBskyActorDefs.ProfileViewBasic | undefined
-  recipients: AppBskyActorDefs.ProfileViewBasic[] | undefined = undefined
+  sender: ChatBskyActorDefs.ProfileViewBasic | undefined
+  recipients: ChatBskyActorDefs.ProfileViewBasic[] | undefined
   snapshot: ConvoState | undefined
 
   constructor(params: ConvoParams) {
@@ -90,6 +90,10 @@ export class Convo {
     this.agent = params.agent
     this.events = params.events
     this.senderUserDid = params.agent.session?.did!
+
+    if (params.placeholderData) {
+      this.setupPlaceholderData(params.placeholderData)
+    }
 
     this.subscribe = this.subscribe.bind(this)
     this.getSnapshot = this.getSnapshot.bind(this)
@@ -131,10 +135,10 @@ export class Convo {
         return {
           status: ConvoStatus.Initializing,
           items: [],
-          convo: undefined,
+          convo: this.convo,
           error: undefined,
-          sender: undefined,
-          recipients: undefined,
+          sender: this.sender,
+          recipients: this.recipients,
           isFetchingHistory: this.isFetchingHistory,
           deleteMessage: undefined,
           sendMessage: undefined,
@@ -176,10 +180,10 @@ export class Convo {
         return {
           status: ConvoStatus.Uninitialized,
           items: [],
-          convo: undefined,
+          convo: this.convo,
           error: undefined,
-          sender: undefined,
-          recipients: undefined,
+          sender: this.sender,
+          recipients: this.recipients,
           isFetchingHistory: false,
           deleteMessage: undefined,
           sendMessage: undefined,
@@ -424,6 +428,20 @@ export class Convo {
     }
   }
 
+  /**
+   * Initialises the convo with placeholder data, if provided. We still refetch it before rendering the convo,
+   * but this allows us to render the convo header immediately.
+   */
+  private setupPlaceholderData(
+    data: NonNullable<ConvoParams['placeholderData']>,
+  ) {
+    this.convo = data.convo
+    this.sender = data.convo.members.find(m => m.did === this.senderUserDid)
+    this.recipients = data.convo.members.filter(
+      m => m.did !== this.senderUserDid,
+    )
+  }
+
   private async setup() {
     try {
       const {convo, sender, recipients} = await this.fetchConvo()
@@ -445,7 +463,7 @@ export class Convo {
         throw new Error('Convo: could not find recipients in convo')
       }
 
-      const userIsDisabled = this.sender.chatDisabled as boolean
+      const userIsDisabled = Boolean(this.sender.chatDisabled)
 
       if (userIsDisabled) {
         this.dispatch({event: ConvoDispatchEvent.Disable})
@@ -511,8 +529,8 @@ export class Convo {
   private pendingFetchConvo:
     | Promise<{
         convo: ChatBskyConvoDefs.ConvoView
-        sender: AppBskyActorDefs.ProfileViewBasic | undefined
-        recipients: AppBskyActorDefs.ProfileViewBasic[]
+        sender: ChatBskyActorDefs.ProfileViewBasic | undefined
+        recipients: ChatBskyActorDefs.ProfileViewBasic[]
       }>
     | undefined
   async fetchConvo() {
@@ -520,8 +538,8 @@ export class Convo {
 
     this.pendingFetchConvo = new Promise<{
       convo: ChatBskyConvoDefs.ConvoView
-      sender: AppBskyActorDefs.ProfileViewBasic | undefined
-      recipients: AppBskyActorDefs.ProfileViewBasic[]
+      sender: ChatBskyActorDefs.ProfileViewBasic | undefined
+      recipients: ChatBskyActorDefs.ProfileViewBasic[]
     }>(async (resolve, reject) => {
       try {
         const response = await networkRetry(2, () => {
@@ -686,7 +704,7 @@ export class Convo {
        * If there's a rev, we should handle it. If there's not a rev, we don't
        * know what it is.
        */
-      if (typeof ev.rev === 'string') {
+      if ('rev' in ev && typeof ev.rev === 'string') {
         const isUninitialized = !this.latestRev
         const isNewEvent = this.latestRev && ev.rev > this.latestRev
 
@@ -1031,7 +1049,10 @@ export class Convo {
            * `getItems` is only run in "active" status states, where
            * `this.sender` is defined
            */
-          sender: this.sender!,
+          sender: {
+            $type: 'chat.bsky.convo.defs#messageViewSender',
+            did: this.sender!.did,
+          },
         },
         nextMessage: null,
         prevMessage: null,

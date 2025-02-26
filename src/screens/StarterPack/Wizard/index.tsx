@@ -54,6 +54,7 @@ import {ListMaybePlaceholder} from '#/components/Lists'
 import {Loader} from '#/components/Loader'
 import {WizardEditListDialog} from '#/components/StarterPack/Wizard/WizardEditListDialog'
 import {Text} from '#/components/Typography'
+import * as bsky from '#/types/bsky'
 import {Provider} from './State'
 
 export function Wizard({
@@ -141,7 +142,7 @@ function WizardInner({
 }: {
   currentStarterPack?: AppBskyGraphDefs.StarterPackView
   currentListItems?: AppBskyGraphDefs.ListItemView[]
-  profile: AppBskyActorDefs.ProfileViewBasic
+  profile: AppBskyActorDefs.ProfileViewDetailed
   moderationOpts: ModerationOpts
 }) {
   const navigation = useNavigation<NavigationProp>()
@@ -284,7 +285,7 @@ function WizardInner({
       <Layout.Header.Outer>
         <Layout.Header.BackButton
           label={_(msg`Back`)}
-          accessibilityHint={_(msg`Go back to the previous step`)}
+          accessibilityHint={_(msg`Returns to the previous step`)}
           onPress={evt => {
             if (state.currentStep !== 'Details') {
               evt.preventDefault()
@@ -363,7 +364,7 @@ function Footer({
   onNext: () => void
   nextBtnText: string
   moderationOpts: ModerationOpts
-  profile: AppBskyActorDefs.ProfileViewBasic
+  profile: AppBskyActorDefs.ProfileViewDetailed
 }) {
   const {_} = useLingui()
   const t = useTheme()
@@ -577,10 +578,10 @@ function Footer({
   )
 }
 
-function getName(item: AppBskyActorDefs.ProfileViewBasic | GeneratorView) {
+function getName(item: bsky.profile.AnyProfileView | GeneratorView) {
   if (typeof item.displayName === 'string') {
     return enforceLen(sanitizeDisplayName(item.displayName), 28, true)
-  } else if (typeof item.handle === 'string') {
+  } else if ('handle' in item && typeof item.handle === 'string') {
     return enforceLen(sanitizeHandle(item.handle), 28, true)
   }
   return ''

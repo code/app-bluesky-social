@@ -70,6 +70,7 @@ import {MessagesScreen} from '#/screens/Messages/ChatList'
 import {MessagesConversationScreen} from '#/screens/Messages/Conversation'
 import {MessagesSettingsScreen} from '#/screens/Messages/Settings'
 import {ModerationScreen} from '#/screens/Moderation'
+import {Screen as ModerationInteractionSettings} from '#/screens/ModerationInteractionSettings'
 import {PostLikedByScreen} from '#/screens/Post/PostLikedBy'
 import {PostQuotesScreen} from '#/screens/Post/PostQuotes'
 import {PostRepostedByScreen} from '#/screens/Post/PostRepostedBy'
@@ -90,6 +91,7 @@ import {VideoFeed} from '#/screens/VideoFeed'
 import {useTheme} from '#/alf'
 import {router} from '#/routes'
 import {Referrer} from '../modules/expo-bluesky-swiss-army'
+import {ProfileSearchScreen} from './screens/Profile/ProfileSearch'
 import {AboutSettingsScreen} from './screens/Settings/AboutSettings'
 import {AccessibilitySettingsScreen} from './screens/Settings/AccessibilitySettings'
 import {AccountSettingsScreen} from './screens/Settings/AccountSettings'
@@ -156,6 +158,14 @@ function commonScreens(Stack: typeof HomeTab, unreadCountLabel?: string) {
         options={{title: title(msg`Blocked Accounts`), requireAuth: true}}
       />
       <Stack.Screen
+        name="ModerationInteractionSettings"
+        getComponent={() => ModerationInteractionSettings}
+        options={{
+          title: title(msg`Post Interaction Settings`),
+          requireAuth: true,
+        }}
+      />
+      <Stack.Screen
         name="Settings"
         getComponent={() => SettingsScreen}
         options={{title: title(msg`Settings`), requireAuth: true}}
@@ -197,6 +207,13 @@ function commonScreens(Stack: typeof HomeTab, unreadCountLabel?: string) {
         name="ProfileList"
         getComponent={() => ProfileListScreen}
         options={{title: title(msg`List`), requireAuth: true}}
+      />
+      <Stack.Screen
+        name="ProfileSearch"
+        getComponent={() => ProfileSearchScreen}
+        options={({route}) => ({
+          title: title(msg`Search @${route.params.name}'s posts`),
+        })}
       />
       <Stack.Screen
         name="PostThread"
@@ -712,15 +729,16 @@ function RoutesContainer({children}: React.PropsWithChildren<{}>) {
       linking={LINKING}
       theme={theme}
       onStateChange={() => {
-        const routeName = getCurrentRouteName()
-        if (routeName === 'Notifications') {
-          logEvent('router:navigate:notifications', {})
-        }
+        logEvent('lake:router:navigate', {
+          from: prevLoggedRouteName.current,
+        })
+        prevLoggedRouteName.current = getCurrentRouteName()
       }}
       onReady={() => {
         attachRouteToLogEvents(getCurrentRouteName)
         logModuleInitTime()
         onReady()
+        logEvent('lake:router:navigate', {})
       }}>
       {children}
     </NavigationContainer>

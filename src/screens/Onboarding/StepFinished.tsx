@@ -1,6 +1,11 @@
 import React from 'react'
 import {View} from 'react-native'
-import {AppBskyGraphDefs, AppBskyGraphStarterpack} from '@atproto/api'
+import {
+  AppBskyActorProfile,
+  AppBskyGraphDefs,
+  AppBskyGraphStarterpack,
+  Un$Typed,
+} from '@atproto/api'
 import {SavedFeed} from '@atproto/api/dist/client/types/app/bsky/actor/defs'
 import {TID} from '@atproto/common-web'
 import {msg, Trans} from '@lingui/macro'
@@ -12,6 +17,7 @@ import {
   BSKY_APP_ACCOUNT_DID,
   DISCOVER_SAVED_FEED,
   TIMELINE_SAVED_FEED,
+  VIDEO_SAVED_FEED,
 } from '#/lib/constants'
 import {useRequestNotificationsPermission} from '#/lib/notifications/notifications'
 import {logEvent, useGate} from '#/lib/statsig/statsig'
@@ -43,6 +49,7 @@ import {News2_Stroke2_Corner0_Rounded as News} from '#/components/icons/News2'
 import {Trending2_Stroke2_Corner2_Rounded as Trending} from '#/components/icons/Trending2'
 import {Loader} from '#/components/Loader'
 import {Text} from '#/components/Typography'
+import * as bsky from '#/types/bsky'
 
 export function StepFinished() {
   const {_} = useLingui()
@@ -111,6 +118,12 @@ export function StepFinished() {
               id: TID.nextStr(),
             },
           ]
+          if (gate('onboarding_add_video_feed')) {
+            feedsToSave.push({
+              ...VIDEO_SAVED_FEED,
+              id: TID.nextStr(),
+            })
+          }
 
           // Any starter pack feeds will be pinned _after_ the defaults
           if (starterPack && starterPack.feeds?.length) {
@@ -134,29 +147,29 @@ export function StepFinished() {
               : undefined
 
           await agent.upsertProfile(async existing => {
-            existing = existing ?? {}
+            let next: Un$Typed<AppBskyActorProfile.Record> = existing ?? {}
 
             if (blobPromise) {
               const res = await blobPromise
               if (res.data.blob) {
-                existing.avatar = res.data.blob
+                next.avatar = res.data.blob
               }
             }
 
             if (starterPack) {
-              existing.joinedViaStarterPack = {
+              next.joinedViaStarterPack = {
                 uri: starterPack.uri,
                 cid: starterPack.cid,
               }
             }
 
-            existing.displayName = ''
+            next.displayName = ''
             // HACKFIX
             // creating a bunch of identical profile objects is breaking the relay
             // tossing this unspecced field onto it to reduce the size of the problem
             // -prf
-            existing.createdAt = new Date().toISOString()
-            return existing
+            next.createdAt = new Date().toISOString()
+            return next
           })
 
           logEvent('onboarding:finished:avatarResult', {
@@ -192,15 +205,20 @@ export function StepFinished() {
     setActiveStarterPack(undefined)
     setHasCheckedForStarterPack(true)
     startProgressGuide(
-      gate('new_postonboarding') ? 'follow-10' : 'like-10-and-follow-7',
+      gate('old_postonboarding') ? 'like-10-and-follow-7' : 'follow-10',
     )
     dispatch({type: 'finish'})
     onboardDispatch({type: 'finish'})
     logEvent('onboarding:finished:nextPressed', {
       usedStarterPack: Boolean(starterPack),
-      starterPackName: AppBskyGraphStarterpack.isRecord(starterPack?.record)
-        ? starterPack.record.name
-        : undefined,
+      starterPackName:
+        starterPack &&
+        bsky.dangerousIsType<AppBskyGraphStarterpack.Record>(
+          starterPack.record,
+          AppBskyGraphStarterpack.isRecord,
+        )
+          ? starterPack.record.name
+          : undefined,
       starterPackCreator: starterPack?.creator.did,
       starterPackUri: starterPack?.uri,
       profilesFollowed: listItems?.length ?? 0,

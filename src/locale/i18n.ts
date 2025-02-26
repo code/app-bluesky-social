@@ -14,17 +14,20 @@ import {AppLanguage} from '#/locale/languages'
 import {messages as messagesAn} from '#/locale/locales/an/messages'
 import {messages as messagesAst} from '#/locale/locales/ast/messages'
 import {messages as messagesCa} from '#/locale/locales/ca/messages'
+import {messages as messagesDa} from '#/locale/locales/da/messages'
 import {messages as messagesDe} from '#/locale/locales/de/messages'
 import {messages as messagesEl} from '#/locale/locales/el/messages'
 import {messages as messagesEn} from '#/locale/locales/en/messages'
 import {messages as messagesEn_GB} from '#/locale/locales/en-GB/messages'
 import {messages as messagesEs} from '#/locale/locales/es/messages'
+import {messages as messagesEu} from '#/locale/locales/eu/messages'
 import {messages as messagesFi} from '#/locale/locales/fi/messages'
 import {messages as messagesFr} from '#/locale/locales/fr/messages'
 import {messages as messagesGa} from '#/locale/locales/ga/messages'
 import {messages as messagesGl} from '#/locale/locales/gl/messages'
 import {messages as messagesHi} from '#/locale/locales/hi/messages'
 import {messages as messagesHu} from '#/locale/locales/hu/messages'
+import {messages as messagesIa} from '#/locale/locales/ia/messages'
 import {messages as messagesId} from '#/locale/locales/id/messages'
 import {messages as messagesIt} from '#/locale/locales/it/messages'
 import {messages as messagesJa} from '#/locale/locales/ja/messages'
@@ -36,6 +39,7 @@ import {messages as messagesPl} from '#/locale/locales/pl/messages'
 import {messages as messagesPt_BR} from '#/locale/locales/pt-BR/messages'
 import {messages as messagesRo} from '#/locale/locales/ro/messages'
 import {messages as messagesRu} from '#/locale/locales/ru/messages'
+import {messages as messagesSv} from '#/locale/locales/sv/messages'
 import {messages as messagesTh} from '#/locale/locales/th/messages'
 import {messages as messagesTr} from '#/locale/locales/tr/messages'
 import {messages as messagesUk} from '#/locale/locales/uk/messages'
@@ -74,6 +78,14 @@ export async function dynamicActivate(locale: AppLanguage) {
       ])
       break
     }
+    case AppLanguage.da: {
+      i18n.loadAndActivate({locale, messages: messagesDa})
+      await Promise.all([
+        import('@formatjs/intl-pluralrules/locale-data/da'),
+        import('@formatjs/intl-numberformat/locale-data/da'),
+      ])
+      break
+    }
     case AppLanguage.de: {
       i18n.loadAndActivate({locale, messages: messagesDe})
       await Promise.all([
@@ -103,6 +115,14 @@ export async function dynamicActivate(locale: AppLanguage) {
       await Promise.all([
         import('@formatjs/intl-pluralrules/locale-data/es'),
         import('@formatjs/intl-numberformat/locale-data/es'),
+      ])
+      break
+    }
+    case AppLanguage.eu: {
+      i18n.loadAndActivate({locale, messages: messagesEu})
+      await Promise.all([
+        import('@formatjs/intl-pluralrules/locale-data/eu'),
+        import('@formatjs/intl-numberformat/locale-data/eu'),
       ])
       break
     }
@@ -151,6 +171,14 @@ export async function dynamicActivate(locale: AppLanguage) {
       await Promise.all([
         import('@formatjs/intl-pluralrules/locale-data/hu'),
         import('@formatjs/intl-numberformat/locale-data/hu'),
+      ])
+      break
+    }
+    case AppLanguage.ia: {
+      i18n.loadAndActivate({locale, messages: messagesIa})
+      await Promise.all([
+        import('@formatjs/intl-pluralrules/locale-data/ia'),
+        import('@formatjs/intl-numberformat/locale-data/ia'),
       ])
       break
     }
@@ -235,6 +263,14 @@ export async function dynamicActivate(locale: AppLanguage) {
       await Promise.all([
         import('@formatjs/intl-pluralrules/locale-data/ru'),
         import('@formatjs/intl-numberformat/locale-data/ru'),
+      ])
+      break
+    }
+    case AppLanguage.sv: {
+      i18n.loadAndActivate({locale, messages: messagesSv})
+      await Promise.all([
+        import('@formatjs/intl-pluralrules/locale-data/sv'),
+        import('@formatjs/intl-numberformat/locale-data/sv'),
       ])
       break
     }

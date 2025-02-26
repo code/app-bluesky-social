@@ -52,6 +52,8 @@ export const MAX_DM_GRAPHEME_LENGTH = 1000
 // but increasing limit per user feedback
 export const MAX_ALT_TEXT = 2000
 
+export const MAX_REPORT_REASON_GRAPHEME_LENGTH = 2000
+
 export function IS_TEST_USER(handle?: string) {
   return handle && handle?.endsWith('.test')
 }
@@ -137,6 +139,11 @@ export const DISCOVER_SAVED_FEED = {
 export const TIMELINE_SAVED_FEED = {
   type: 'timeline',
   value: 'following',
+  pinned: true,
+}
+export const VIDEO_SAVED_FEED = {
+  type: 'feed',
+  value: VIDEO_FEED_URI,
   pinned: true,
 }
 

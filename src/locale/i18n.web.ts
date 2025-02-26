@@ -24,6 +24,10 @@ export async function dynamicActivate(locale: AppLanguage) {
       mod = await import(`./locales/ca/messages`)
       break
     }
+    case AppLanguage.da: {
+      mod = await import(`./locales/da/messages`)
+      break
+    }
     case AppLanguage.de: {
       mod = await import(`./locales/de/messages`)
       break
@@ -38,6 +42,10 @@ export async function dynamicActivate(locale: AppLanguage) {
     }
     case AppLanguage.es: {
       mod = await import(`./locales/es/messages`)
+      break
+    }
+    case AppLanguage.eu: {
+      mod = await import(`./locales/eu/messages`)
       break
     }
     case AppLanguage.fi: {
@@ -62,6 +70,10 @@ export async function dynamicActivate(locale: AppLanguage) {
     }
     case AppLanguage.hu: {
       mod = await import(`./locales/hu/messages`)
+      break
+    }
+    case AppLanguage.ia: {
+      mod = await import(`./locales/ia/messages`)
       break
     }
     case AppLanguage.id: {
@@ -106,6 +118,10 @@ export async function dynamicActivate(locale: AppLanguage) {
     }
     case AppLanguage.ru: {
       mod = await import(`./locales/ru/messages`)
+      break
+    }
+    case AppLanguage.sv: {
+      mod = await import(`./locales/sv/messages`)
       break
     }
     case AppLanguage.th: {

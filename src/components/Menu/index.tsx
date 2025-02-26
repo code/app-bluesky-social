@@ -47,7 +47,12 @@ export function Root({
   return <Context.Provider value={context}>{children}</Context.Provider>
 }
 
-export function Trigger({children, label, role = 'button'}: TriggerProps) {
+export function Trigger({
+  children,
+  label,
+  role = 'button',
+  hint,
+}: TriggerProps) {
   const context = useMenuContext()
   const {state: focused, onIn: onFocus, onOut: onBlur} = useInteractionState()
   const {
@@ -65,11 +70,13 @@ export function Trigger({children, label, role = 'button'}: TriggerProps) {
       pressed,
     },
     props: {
+      ref: null,
       onPress: context.control.open,
       onFocus,
       onBlur,
       onPressIn,
       onPressOut,
+      accessibilityHint: hint,
       accessibilityLabel: label,
       accessibilityRole: role,
     },
@@ -93,7 +100,7 @@ export function Outer({
       <Dialog.Handle />
       {/* Re-wrap with context since Dialogs are portal-ed to root */}
       <Context.Provider value={context}>
-        <Dialog.ScrollableInner label={_(msg`Menu`)} style={[a.py_sm]}>
+        <Dialog.ScrollableInner label={_(msg`Menu`)}>
           <View style={[a.gap_lg]}>
             {children}
             {isNative && showCancel && <Cancel />}
