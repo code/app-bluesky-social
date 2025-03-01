@@ -12,11 +12,13 @@ export type CommonNavigatorParams = {
   ModerationModlists: undefined
   ModerationMutedAccounts: undefined
   ModerationBlockedAccounts: undefined
+  ModerationInteractionSettings: undefined
   Settings: undefined
   Profile: {name: string; hideBackButton?: boolean}
   ProfileFollowers: {name: string}
   ProfileFollows: {name: string}
   ProfileKnownFollowers: {name: string}
+  ProfileSearch: {name: string; q?: string}
   ProfileList: {name: string; rkey: string}
   PostThread: {name: string; rkey: string}
   PostLikedBy: {name: string; rkey: string}

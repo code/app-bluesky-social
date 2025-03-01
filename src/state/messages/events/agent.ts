@@ -3,7 +3,7 @@ import EventEmitter from 'eventemitter3'
 import {nanoid} from 'nanoid/non-secure'
 
 import {networkRetry} from '#/lib/async/retry'
-import {logger} from '#/logger'
+import {Logger} from '#/logger'
 import {
   BACKGROUND_POLL_INTERVAL,
   DEFAULT_POLL_INTERVAL,
@@ -19,6 +19,7 @@ import {
 import {DM_SERVICE_HEADERS} from '#/state/queries/messages/const'
 
 const LOGGER_CONTEXT = 'MessagesEventBus'
+const logger = Logger.create(Logger.Context.DMsAgent)
 
 export class MessagesEventBus {
   private id: string
@@ -65,10 +66,7 @@ export class MessagesEventBus {
     const handle = (event: MessagesEventBusEvent) => {
       if (event.type === 'logs' && options.convoId) {
         const filteredLogs = event.logs.filter(log => {
-          if (
-            typeof log.convoId === 'string' &&
-            log.convoId === options.convoId
-          ) {
+          if ('convoId' in log && log.convoId === options.convoId) {
             return log.convoId === options.convoId
           }
           return false
@@ -93,17 +91,17 @@ export class MessagesEventBus {
   }
 
   background() {
-    logger.debug(`${LOGGER_CONTEXT}: background`, {}, logger.DebugContext.convo)
+    logger.debug(`${LOGGER_CONTEXT}: background`, {})
     this.dispatch({event: MessagesEventBusDispatchEvent.Background})
   }
 
   suspend() {
-    logger.debug(`${LOGGER_CONTEXT}: suspend`, {}, logger.DebugContext.convo)
+    logger.debug(`${LOGGER_CONTEXT}: suspend`, {})
     this.dispatch({event: MessagesEventBusDispatchEvent.Suspend})
   }
 
   resume() {
-    logger.debug(`${LOGGER_CONTEXT}: resume`, {}, logger.DebugContext.convo)
+    logger.debug(`${LOGGER_CONTEXT}: resume`, {})
     this.dispatch({event: MessagesEventBusDispatchEvent.Resume})
   }
 
@@ -225,19 +223,15 @@ export class MessagesEventBus {
         break
     }
 
-    logger.debug(
-      `${LOGGER_CONTEXT}: dispatch '${action.event}'`,
-      {
-        id: this.id,
-        prev: prevStatus,
-        next: this.status,
-      },
-      logger.DebugContext.convo,
-    )
+    logger.debug(`${LOGGER_CONTEXT}: dispatch '${action.event}'`, {
+      id: this.id,
+      prev: prevStatus,
+      next: this.status,
+    })
   }
 
   private async init() {
-    logger.debug(`${LOGGER_CONTEXT}: init`, {}, logger.DebugContext.convo)
+    logger.debug(`${LOGGER_CONTEXT}: init`, {})
 
     try {
       const response = await networkRetry(2, () => {
@@ -261,7 +255,7 @@ export class MessagesEventBus {
       this.dispatch({event: MessagesEventBusDispatchEvent.Ready})
     } catch (e: any) {
       logger.error(e, {
-        context: `${LOGGER_CONTEXT}: init failed`,
+        message: `${LOGGER_CONTEXT}: init failed`,
       })
 
       this.dispatch({
@@ -330,7 +324,6 @@ export class MessagesEventBus {
     //       this.requestedPollIntervals.values(),
     //     ),
     //   },
-    //   logger.DebugContext.convo,
     // )
 
     try {
@@ -355,7 +348,7 @@ export class MessagesEventBus {
          * If there's a rev, we should handle it. If there's not a rev, we don't
          * know what it is.
          */
-        if (typeof ev.rev === 'string') {
+        if ('rev' in ev && typeof ev.rev === 'string') {
           /*
            * We only care about new events
            */
@@ -375,12 +368,12 @@ export class MessagesEventBus {
           this.emitter.emit('event', {type: 'logs', logs: batch})
         } catch (e: any) {
           logger.error(e, {
-            context: `${LOGGER_CONTEXT}: process latest events`,
+            message: `${LOGGER_CONTEXT}: process latest events`,
           })
         }
       }
     } catch (e: any) {
-      logger.error(e, {context: `${LOGGER_CONTEXT}: poll events failed`})
+      logger.error(e, {message: `${LOGGER_CONTEXT}: poll events failed`})
 
       this.dispatch({
         event: MessagesEventBusDispatchEvent.Error,

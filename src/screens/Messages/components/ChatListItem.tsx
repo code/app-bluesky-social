@@ -1,7 +1,6 @@
 import React, {useCallback, useMemo, useState} from 'react'
 import {GestureResponderEvent, View} from 'react-native'
 import {
-  AppBskyActorDefs,
   AppBskyEmbedRecord,
   ChatBskyConvoDefs,
   moderateProfile,
@@ -9,6 +8,7 @@ import {
 } from '@atproto/api'
 import {msg} from '@lingui/macro'
 import {useLingui} from '@lingui/react'
+import {useQueryClient} from '@tanstack/react-query'
 
 import {GestureActionView} from '#/lib/custom-animations/GestureActionView'
 import {useHaptics} from '#/lib/haptics'
@@ -23,7 +23,11 @@ import {
 import {isNative} from '#/platform/detection'
 import {useProfileShadow} from '#/state/cache/profile-shadow'
 import {useModerationOpts} from '#/state/preferences/moderation-opts'
-import {useMarkAsReadMutation} from '#/state/queries/messages/conversation'
+import {
+  precacheConvoQuery,
+  useMarkAsReadMutation,
+} from '#/state/queries/messages/conversation'
+import {precacheProfile} from '#/state/queries/profile'
 import {useSession} from '#/state/session'
 import {TimeElapsed} from '#/view/com/util/TimeElapsed'
 import {PreviewableUserAvatar} from '#/view/com/util/UserAvatar'
@@ -39,6 +43,7 @@ import {Link} from '#/components/Link'
 import {useMenuControl} from '#/components/Menu'
 import {PostAlerts} from '#/components/moderation/PostAlerts'
 import {Text} from '#/components/Typography'
+import * as bsky from '#/types/bsky'
 
 export let ChatListItem = ({
   convo,
@@ -73,7 +78,7 @@ function ChatListItemReady({
   moderationOpts,
 }: {
   convo: ChatBskyConvoDefs.ConvoView
-  profile: AppBskyActorDefs.ProfileViewBasic
+  profile: bsky.profile.AnyProfileView
   moderationOpts: ModerationOpts
 }) {
   const t = useTheme()
@@ -89,6 +94,7 @@ function ChatListItemReady({
     [profile, moderationOpts],
   )
   const playHaptic = useHaptics()
+  const queryClient = useQueryClient()
   const isUnread = convo.unreadCount > 0
 
   const blockInfo = useMemo(() => {
@@ -198,6 +204,8 @@ function ChatListItemReady({
 
   const onPress = useCallback(
     (e: GestureResponderEvent) => {
+      precacheProfile(queryClient, profile)
+      precacheConvoQuery(queryClient, convo)
       decrementBadgeCount(convo.unreadCount)
       if (isDeletedAccount) {
         e.preventDefault()
@@ -207,7 +215,7 @@ function ChatListItemReady({
         logEvent('chat:open', {logContext: 'ChatsList'})
       }
     },
-    [convo.unreadCount, isDeletedAccount, menuControl],
+    [isDeletedAccount, menuControl, queryClient, profile, convo],
   )
 
   const onLongPress = useCallback(() => {
@@ -273,7 +281,7 @@ function ChatListItemReady({
             !isDeletedAccount
               ? _(msg`Go to conversation with ${profile.handle}`)
               : _(
-                  msg`This conversation is with a deleted or a deactivated account. Press for options.`,
+                  msg`This conversation is with a deleted or a deactivated account. Press for options`,
                 )
           }
           accessibilityActions={
